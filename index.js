@@ -47,8 +47,12 @@ const toRad = (Value) => {
 // num of locations must be minimum 2
 // min distance needs to be min 1
 // within range needs to be greater than min distance
-// NOTE: within radius is in meters whereas min distance is in km
-const generateLocationsWithinRange = (withinRadius, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, locationsGenerated, callback) => {
+const generateLocationsWithinRange = ({
+                                          withinRadiusInKm, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, locationsGenerated, callback
+                                      }) => {
+    // convert km to meters
+    let withinRadius = withinRadiusInKm * 1000; //convert to meters
+
     if (locationsGenerated.length == numOfLocations) {
         return locationsGenerated;
     }
@@ -57,11 +61,15 @@ const generateLocationsWithinRange = (withinRadius, numOfLocations, originalLati
 
     let generatedLocation = generateRandomLocationWithinRadius(withinRadius, originalLatitude, originalLongitude);
 
-    // if the location is generated for the first time
-    if (locationsGenerated.length < 1) {
+    if (numOfLocations == 1) {
+        callback([ generatedLocation ]);
+    } else if (locationsGenerated.length < 1) {
+        // if the location is generated for the first time
         tempGeneratedLocations.push(generatedLocation);
 
-        generateLocationsWithinRange(withinRadius, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, tempGeneratedLocations, callback);
+        generateLocationsWithinRange({
+            withinRadiusInKm, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, locationsGenerated: tempGeneratedLocations, callback
+        });
     } else {
         // check if the generated location very close to the other generated locations
         let isCloseToOthers = false;
@@ -76,7 +84,9 @@ const generateLocationsWithinRange = (withinRadius, numOfLocations, originalLati
 
         if (isCloseToOthers) {
             // generate the location again cos it is too close
-            generateLocationsWithinRange(withinRadius, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, tempGeneratedLocations, callback);
+            generateLocationsWithinRange({
+                withinRadiusInKm, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, locationsGenerated: tempGeneratedLocations, callback
+            });
         } else {
             tempGeneratedLocations.push(generatedLocation);
 
@@ -85,21 +95,14 @@ const generateLocationsWithinRange = (withinRadius, numOfLocations, originalLati
                 callback(tempGeneratedLocations);
             } else {
                 // generate another location cos it needs more
-                generateLocationsWithinRange(withinRadius, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, tempGeneratedLocations, callback);
+                generateLocationsWithinRange({
+                    withinRadiusInKm, numOfLocations, originalLatitude, originalLongitude, minDistanceBetweenPoints, locationsGenerated: tempGeneratedLocations, callback
+                });
             }
         }
     }
 }
 
-let firstLocation = generateRandomLocationWithinRadius(2000, 51.590998, -0.1692847);
-let secondLocation = generateRandomLocationWithinRadius(2000, 51.590998, -0.1692847);
-
-let distance = calcCrow(firstLocation.latitude, firstLocation.longitude, secondLocation.latitude, secondLocation.longitude);
-
-console.log(`First location ${firstLocation.latitude}, ${firstLocation.longitude}`)
-console.log(`Second location ${secondLocation.latitude}, ${secondLocation.longitude}`)
-console.log(`Distance is ${distance}`)
-
-generateLocationsWithinRange(10000, 3, 51.590998, -0.1692847, 1, [], (locations) => {
-    console.log(locations);
-});
+module.exports = {
+    generateLocationsWithinRange
+}

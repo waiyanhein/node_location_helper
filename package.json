@@ -1,11 +1,23 @@
 {
-  "name": "node_location_generator",
+  "name": "location-generator",
   "version": "1.0.0",
-  "description": "",
+  "description": "Package to generate a random location and multiple locations within a radius",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "wai",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waiyanhein/node_location_helper.git"
+  },
+  "keywords": [
+    "js-location-generator",
+    "location-generator"
+  ],
+  "bugs": {
+    "url": "https://github.com/waiyanhein/node_location_helper/issues"
+  },
+  "homepage": "https://github.com/waiyanhein/node_location_helper#readme"
 }
